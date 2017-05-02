@@ -1,7 +1,4 @@
-# dolores-ldap-init
-dolroes ldap server initial tool
-
-## Dolores 数据库安装指南
+Dolores 数据库安装指南
 
 Dolores后端存储使用LDAP协议，本文档会帮助您顺利的搭建一台[LDAP](http://baike.baidu.com/link?url=wzAGnnyGYXjgrECbVw7e1mVMOvEjRTjuqw4L5mNBurhLZmAYGt0FlwLOypEcH2oDlDqeKEo8-c10dchxUGBsCa)服务器
 
@@ -25,7 +22,7 @@ Openldap安装完成以后会在 `/usr/local/etc/openldap`(根据编译时`./con
 go get https://www.github.com/DoloresTeam/dolores-ldap-init
 ```
 ##### 配置`Dolores`初始化程序
-``` yarm
+``` yaml
 host: 127.0.0.1 # ldap host
 port: 389
 subfix: dc=dolores,dc=org
@@ -40,5 +37,6 @@ go build
 ./dolores-ldap-init -path ./conf.yaml
 ```
 
-####0x02. 测试
-使用ldap可视化客户端[Apache Directory Studio](http://directory.apache.org/studio/)链接Ldap服务器，展开所有`DIT`，和下图结构类似，说明初始化成功。（应该紧有名字不一致）![org](./asset/org.png)
+#### 0x02. 测试
+  使用ldap可视化客户端[Apache Directory Studio](http://directory.apache.org/studio/)链接Ldap服务器，展开所有`DIT`，和下图结构类似，说明初始化成功。（应该紧有名字不一致）
+![org](./asset/org.png)
