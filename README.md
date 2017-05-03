@@ -40,3 +40,6 @@ go build
 #### 0x03. 测试
   使用ldap可视化客户端[Apache Directory Studio](http://directory.apache.org/studio/)链接Ldap服务器，展开所有`DIT`，和下图结构类似，说明初始化成功.
 ![org](./asset/org.png)
+
+## TODO
+提供docker镜像支持
