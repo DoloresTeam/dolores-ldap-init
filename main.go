@@ -90,22 +90,28 @@ func main() {
 	aq.Attribute(`ou`, []string{`permission`})
 	checkError(l.Add(aq))
 
-	log.Print(`4.1 create unit permission`)
-	aq = ldap.NewAddRequest(`ou=unit,ou=permission,` + config.Subfix)
-	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
-	aq.Attribute(`ou`, []string{`unitPermission`})
-	checkError(l.Add(aq))
-
-	log.Print(`4.2 create person permission`)
-	aq = ldap.NewAddRequest(`ou=person,ou=permission,` + config.Subfix)
-	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
-	aq.Attribute(`ou`, []string{`personPermission`})
-	checkError(l.Add(aq))
-
 	log.Print(`5. create role`)
 	aq = ldap.NewAddRequest(`ou=role,` + config.Subfix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`role`})
+	checkError(l.Add(aq))
+
+	log.Print(`6. create type`)
+	aq = ldap.NewAddRequest(`ou=type,` + config.Subfix)
+	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
+	aq.Attribute(`ou`, []string{`type`})
+	checkError(l.Add(aq))
+
+	log.Print(`6.1 create unit type`)
+	aq = ldap.NewAddRequest(`ou=unit,ou=type,` + config.Subfix)
+	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
+	aq.Attribute(`ou`, []string{`type`})
+	checkError(l.Add(aq))
+
+	log.Print(`6.2 create person type`)
+	aq = ldap.NewAddRequest(`ou=person,ou=type,` + config.Subfix)
+	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
+	aq.Attribute(`ou`, []string{`type`})
 	checkError(l.Add(aq))
 
 	log.Print(`initial done ~`)
