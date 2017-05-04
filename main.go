@@ -90,6 +90,18 @@ func main() {
 	aq.Attribute(`ou`, []string{`permission`})
 	checkError(l.Add(aq))
 
+	log.Print(`4.1 create unit permission`)
+	aq = ldap.NewAddRequest(`ou=unit,ou=permission,` + config.Subfix)
+	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
+	aq.Attribute(`ou`, []string{`unit`})
+	checkError(l.Add(aq))
+
+	log.Print(`4.2 create person permission`)
+	aq = ldap.NewAddRequest(`ou=person,ou=permission,` + config.Subfix)
+	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
+	aq.Attribute(`ou`, []string{`person`})
+	checkError(l.Add(aq))
+
 	log.Print(`5. create role`)
 	aq = ldap.NewAddRequest(`ou=role,` + config.Subfix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
