@@ -59,7 +59,7 @@ olcObjectClasses: ( 0.9.3.2.8.1.4 NAME 'role'
   STRUCTURAL
   MUST ( cn $ objectIdentifier $ pid )
   MAY description )
-olcObjectClasses: ( 0.9.3.2.8.1.5 NAME 'dolresType'
+olcObjectClasses: ( 0.9.3.2.8.1.5 NAME 'doloresType'
   DESC 'Kevin.Gong: deparment & person type for dolores.'
   SUP top
   STRUCTURAL
