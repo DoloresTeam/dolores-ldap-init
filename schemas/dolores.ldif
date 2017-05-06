@@ -16,24 +16,24 @@ olcAttributeTypes: ( 0.9.3.2.8.0.3 NAME ( 'imPassword' 'impwd' )
   DESC 'Kevin.Gong: password of im'
   EQUALITY octetStringMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{256} )
-olcAttributeTypes: ( 0.9.3.2.8.0.4 NAME ( 'rbacUnitType' 'rbacUT' )
+olcAttributeTypes: ( 0.9.3.2.8.0.4 NAME ( 'rbacType' )
   DESC 'Kevin.Gong: rbace tpe for dolores.'
   EQUALITY caseIgnoreMatch
   SUBSTR caseIgnoreSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
-olcAttributeTypes: ( 0.9.3.2.8.0.5 NAME ( 'rbacPersonType' 'rbacPT' )
-  DESC 'Kevin.Gong: rbace tpe for dolores.'
-  EQUALITY caseIgnoreMatch
-  SUBSTR caseIgnoreSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
-olcAttributeTypes: ( 0.9.3.2.8.0.6 NAME 'rbacRole'
+olcAttributeTypes: ( 0.9.3.2.8.0.5 NAME 'rbacRole'
   DESC 'Kevin.Gong: rbac alc of role'
   EQUALITY caseExactMatch
   SUBSTR caseIgnoreSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
   USAGE userApplications )
-olcAttributeTypes: ( 0.9.3.2.8.0.7 NAME ( 'permissionIdentifier' 'pid' )
-  DESC 'Kevin.Gong: unit id'
+olcAttributeTypes: ( 0.9.3.2.8.0.6 NAME ( 'unitpermissionIdentifier' 'upid' )
+  DESC 'Kevin.Gong: unit permission ids'
+  EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+olcAttributeTypes: ( 0.9.3.2.8.0.7 NAME ( 'personpermissionIdentifier' 'ppid' )
+  DESC 'Kevin.Gong: person permission ids'
   EQUALITY caseIgnoreMatch
   SUBSTR caseIgnoreSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
@@ -41,23 +41,23 @@ olcObjectClasses: ( 0.9.3.2.8.1.1 NAME 'personExtended'
   DESC 'Kevin.Gong: extend person for dolores'
   AUXILIARY
   MUST objectIdentifier
-  MAY ( imAccount $ imPassword $ rbacRole $ rbacPersonType ) )
+  MAY ( imAccount $ imPassword $ rbacRole $ rbacType ) )
 olcObjectClasses: ( 0.9.3.2.8.1.2 NAME 'unitExtended'
   DESC 'Kevin.Gong: unit extended for dolores.'
   AUXILIARY
   MUST objectIdentifier
-  MAY rbacUnitType )
+  MAY rbacType )
 olcObjectClasses: ( 0.9.3.2.8.1.3 NAME ( 'permission' 'p' )
   DESC 'Kevin.Gong: permission for dolores.'
   SUP top
   STRUCTURAL
-  MUST ( objectIdentifier $ rbacUT $ rbacPT )
+  MUST ( objectIdentifier $ rbacType )
   MAY ( cn $ description ) )
 olcObjectClasses: ( 0.9.3.2.8.1.4 NAME 'role'
   DESC 'Kevin.Gong: role for dolores.'
   SUP top
   STRUCTURAL
-  MUST ( cn $ objectIdentifier $ pid )
+  MUST ( cn $ objectIdentifier $ upid $ ppid )
   MAY description )
 olcObjectClasses: ( 0.9.3.2.8.1.5 NAME 'doloresType'
   DESC 'Kevin.Gong: deparment & person type for dolores.'
