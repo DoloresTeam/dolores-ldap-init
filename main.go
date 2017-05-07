@@ -16,7 +16,7 @@ type Config struct {
 	Port        int
 	RootDN      string
 	RootPWD     string
-	Subfix      string
+	Subffix     string
 	CompanyName string
 }
 
@@ -59,19 +59,19 @@ func main() {
 
 	log.Print(`1. create root entry`)
 
-	aq := ldap.NewAddRequest(config.Subfix)
+	aq := ldap.NewAddRequest(config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organization`, `dcObject`, `top`})
 	aq.Attribute(`o`, []string{`root created by dolores ldap init tool`})
 	checkError(l.Add(aq))
 
 	log.Print(`2. create unit`)
-	aq = ldap.NewAddRequest(`ou=unit,` + config.Subfix)
+	aq = ldap.NewAddRequest(`ou=unit,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`unit`})
 	checkError(l.Add(aq))
 
 	log.Print(`2.1 create organization`)
-	aq = ldap.NewAddRequest(`oid=1,ou=unit,` + config.Subfix)
+	aq = ldap.NewAddRequest(`oid=1,ou=unit,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organization`, `unitExtended`, `top`})
 	aq.Attribute(`o`, []string{config.CompanyName})
 	aq.Attribute(`oid`, []string{`1`})
@@ -79,49 +79,49 @@ func main() {
 	checkError(l.Add(aq))
 
 	log.Print(`3. create person`)
-	aq = ldap.NewAddRequest(`ou=person,` + config.Subfix)
+	aq = ldap.NewAddRequest(`ou=person,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`person`})
 	checkError(l.Add(aq))
 
 	log.Print(`4. create permission`)
-	aq = ldap.NewAddRequest(`ou=permission,` + config.Subfix)
+	aq = ldap.NewAddRequest(`ou=permission,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`permission`})
 	checkError(l.Add(aq))
 
 	log.Print(`4.1 create unit permission`)
-	aq = ldap.NewAddRequest(`ou=unit,ou=permission,` + config.Subfix)
+	aq = ldap.NewAddRequest(`ou=unit,ou=permission,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`unit`})
 	checkError(l.Add(aq))
 
 	log.Print(`4.2 create person permission`)
-	aq = ldap.NewAddRequest(`ou=person,ou=permission,` + config.Subfix)
+	aq = ldap.NewAddRequest(`ou=person,ou=permission,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`person`})
 	checkError(l.Add(aq))
 
 	log.Print(`5. create role`)
-	aq = ldap.NewAddRequest(`ou=role,` + config.Subfix)
+	aq = ldap.NewAddRequest(`ou=role,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`role`})
 	checkError(l.Add(aq))
 
 	log.Print(`6. create type`)
-	aq = ldap.NewAddRequest(`ou=type,` + config.Subfix)
+	aq = ldap.NewAddRequest(`ou=type,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`type`})
 	checkError(l.Add(aq))
 
 	log.Print(`6.1 create unit type`)
-	aq = ldap.NewAddRequest(`ou=unit,ou=type,` + config.Subfix)
+	aq = ldap.NewAddRequest(`ou=unit,ou=type,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`type`})
 	checkError(l.Add(aq))
 
 	log.Print(`6.2 create person type`)
-	aq = ldap.NewAddRequest(`ou=person,ou=type,` + config.Subfix)
+	aq = ldap.NewAddRequest(`ou=person,ou=type,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`type`})
 	checkError(l.Add(aq))
