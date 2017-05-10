@@ -76,10 +76,10 @@ func main() {
 
 	checkError(l.Add(aq))
 
-	log.Print(`3. create person`)
-	aq = ldap.NewAddRequest(`ou=person,` + config.Subffix)
+	log.Print(`3. create member`)
+	aq = ldap.NewAddRequest(`ou=member,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
-	aq.Attribute(`ou`, []string{`person`})
+	aq.Attribute(`ou`, []string{`member`})
 	checkError(l.Add(aq))
 
 	log.Print(`4. create permission`)
@@ -94,10 +94,10 @@ func main() {
 	aq.Attribute(`ou`, []string{`unit`})
 	checkError(l.Add(aq))
 
-	log.Print(`4.2 create person permission`)
-	aq = ldap.NewAddRequest(`ou=person,ou=permission,` + config.Subffix)
+	log.Print(`4.2 create member permission`)
+	aq = ldap.NewAddRequest(`ou=member,ou=permission,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
-	aq.Attribute(`ou`, []string{`person`})
+	aq.Attribute(`ou`, []string{`member`})
 	checkError(l.Add(aq))
 
 	log.Print(`5. create role`)
@@ -118,8 +118,8 @@ func main() {
 	aq.Attribute(`ou`, []string{`type`})
 	checkError(l.Add(aq))
 
-	log.Print(`6.2 create person type`)
-	aq = ldap.NewAddRequest(`ou=person,ou=type,` + config.Subffix)
+	log.Print(`6.2 create member type`)
+	aq = ldap.NewAddRequest(`ou=member,ou=type,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`type`})
 	checkError(l.Add(aq))
