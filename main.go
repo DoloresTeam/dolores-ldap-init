@@ -11,6 +11,7 @@ import (
 	yaml "gopkg.in/yaml.v1"
 )
 
+// Config ...
 type Config struct {
 	Host        string
 	Port        int
@@ -37,8 +38,6 @@ func main() {
 	if err != nil {
 		log.Panic(`配置文件不正确`)
 	}
-
-	log.Printf(`config: [%s]`, config)
 
 	log.Print(`will dial ldap server`)
 	// 链接ldap服务器
@@ -71,10 +70,9 @@ func main() {
 	checkError(l.Add(aq))
 
 	log.Print(`2.1 create organization`)
-	aq = ldap.NewAddRequest(`oid=1,ou=unit,` + config.Subffix)
-	aq.Attribute(`objectClass`, []string{`organization`, `unitExtended`, `top`})
-	aq.Attribute(`o`, []string{config.CompanyName})
-	aq.Attribute(`oid`, []string{`1`})
+	aq = ldap.NewAddRequest(`o=1,ou=unit,` + config.Subffix)
+	aq.Attribute(`objectClass`, []string{`organization`, `top`})
+	aq.Attribute(`description`, []string{config.CompanyName})
 
 	checkError(l.Add(aq))
 
