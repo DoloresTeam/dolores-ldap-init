@@ -8,7 +8,7 @@ import (
 	"os"
 
 	ldap "gopkg.in/ldap.v2"
-	yaml "gopkg.in/yaml.v1"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // Config ...
