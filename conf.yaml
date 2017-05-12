@@ -3,4 +3,6 @@ port: 389
 subffix: dc=dolores,dc=store
 rootdn: cn=admin,dc=dolores,dc=store # 注意rootDN的后缀要和上面一致
 rootpwd: secret
+crootdn: cn=config #配置数据库 dn
+crootpwd: secret #配置数据库密码
 companyname: Dolores科技有限公司

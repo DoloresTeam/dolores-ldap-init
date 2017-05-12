@@ -17,6 +17,8 @@ type Config struct {
 	Port        int
 	RootDN      string
 	RootPWD     string
+	CRootDN     string
+	CRootPWD    string
 	Subffix     string
 	CompanyName string
 }
@@ -39,7 +41,6 @@ func main() {
 		log.Panic(`配置文件不正确`)
 	}
 
-	log.Print(`will dial ldap server`)
 	// 链接ldap服务器
 	l, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", config.Host, config.Port))
 	if err != nil {
@@ -47,18 +48,45 @@ func main() {
 	}
 	defer l.Close()
 
-	log.Print(`did dial ldap server`)
-	log.Print(`will bind database`)
-	// 绑定config数据库
+	err = l.Bind(config.CRootDN, config.CRootPWD)
+	if err != nil {
+		panic(err)
+	}
+
+	aq := ldap.NewAddRequest(`cn=dolores,cn=schema,cn=config`)
+	aq.Attribute(`objectClass`, []string{`olcSchemaConfig`})
+	checkError(l.Add(aq))
+
+	mq := ldap.NewModifyRequest(`cn={1}dolores,cn=schema,cn=config`) // config数据库默认会加上序号 {0}是core
+	mq.Replace(`olcAttributeTypes`, []string{
+		`( 0.9.3.2.8.0.1 NAME 'id' DESC 'Kevin.Gong unit id' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
+		`( 0.9.3.2.8.0.2 NAME 'thirdAccount' DESC 'Kevin.Gong: thrid party account id' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
+		`( 0.9.3.2.8.0.3 NAME 'thirdPassword' DESC 'Kevin.Gong: password of im' EQUALITY octetStringMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{256} )`,
+		`( 0.9.3.2.8.0.4 NAME 'rbacType' DESC 'Kevin.Gong: rbace tpe for dolores.' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
+		`( 0.9.3.2.8.0.5 NAME 'rbacRole' DESC 'Kevin.Gong: rbac alc of role' EQUALITY caseExactMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 USAGE userApplications )`,
+		`( 0.9.3.2.8.0.6 NAME ( 'unitpermissionIdentifier' 'upid' ) DESC 'Kevin.Gong: unit permission ids' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
+		`( 0.9.3.2.8.0.7 NAME ( 'personpermissionIdentifier' 'ppid' ) DESC 'Kevin.Gong: person permission ids' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
+		`( 0.9.3.2.8.0.8 NAME 'unitID' DESC 'Kevin.Gong unit id' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
+		`( 0.9.3.2.8.0.9 NAME 'gender' DESC 'Kevin.Gong gender of member' EQUALITY numericStringMatch SUBSTR numericStringSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{16} )`,
+	})
+	mq.Replace(`olcObjectClasses`, []string{
+		`( 0.9.3.2.8.1.1 NAME 'member' DESC 'Kevin.Gong: member for dolores' STRUCTURAL MUST (id $ rbacRole $ rbacType $ unitID $ name $ telephoneNumber $ userPassword ) MAY ( labeledURI $ gender $ thirdAccount $ thirdPassword $ email $ title $ cn ) )`,
+		`( 0.9.3.2.8.1.2 NAME 'unit' DESC 'Kevin.Gong: unit extended for dolores.' AUXILIARY MUST ( id $ rbacType ))`,
+		`( 0.9.3.2.8.1.3 NAME 'permission' DESC 'Kevin.Gong: permission for dolores.' SUP top STRUCTURAL MUST ( id $ rbacType ) MAY ( cn $ description ) )`,
+		`( 0.9.3.2.8.1.4 NAME 'role' DESC 'Kevin.Gong: role for dolores.' SUP top STRUCTURAL MUST ( cn $ id $ upid $ ppid ) MAY description )`,
+		`( 0.9.3.2.8.1.5 NAME 'doloresType' DESC 'Kevin.Gong: deparment & person type for dolores.' SUP top STRUCTURAL MUST ( id $ cn ) MAY ( description ) )`,
+	})
+
+	checkError(l.Modify(mq))
+
+	// 绑定 mdb 数据库
 	err = l.Bind(config.RootDN, config.RootPWD)
 	if err != nil {
 		panic(err)
 	}
-	log.Print(`did bind database`)
 
 	log.Print(`1. create root entry`)
-
-	aq := ldap.NewAddRequest(config.Subffix)
+	aq = ldap.NewAddRequest(config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organization`, `dcObject`, `top`})
 	aq.Attribute(`o`, []string{`root created by dolores ldap init tool`})
 	checkError(l.Add(aq))
