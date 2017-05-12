@@ -8,9 +8,8 @@ Dolores后端存储使用LDAP协议，本文档会帮助您顺利的搭建一台
 Openldap安装完成以后会在 `/usr/local/etc/openldap`(根据编译时`./configure --prefix`参数可能会略有差异)生成默认的配置文件。
 
  1. 打开`slapd.ldif`文件
- 2. 给`mdb`数据库添加`olcRootDN`和 `olcRootPW`
- 3. 下载`dolores`[自定义`schema`文件](https://github.com/DoloresTeam/dolores-ldap-init/blob/master/schemas/dolores.ldif) 然后在`slapd.ldif`中 `include file:///usr/local/etc/openldap/schema/core.ldif`的下方添加 `include path/to/dolores.ldif`
- 4. 将`slapd.ldif`导入`config`数据库，命令类似 `./slapdadd -l /usr/local/etc/openldap/slapd.ldif -F /usr/local/etc/openldap -n 0 -d 3`
+ 2. 给`mdb`和`config`数据库配置`olcRootDN`和 `olcRootPW`
+ 3. 将`slapd.ldif`导入`config`数据库，命令类似 `./slapdadd -l /usr/local/etc/openldap/slapd.ldif -F /usr/local/etc/openldap -n 0 -d 3`
 
 #### 0x02.初始化
 
@@ -28,12 +27,14 @@ port: 389
 subfix: dc=dolores,dc=org
 rootdn: cn=admin,dc=dolores,dc=org # 注意rootDN的后缀要和上面一致
 rootpwd: secret
+crootdn: cn=config #配置数据库 dn
+crootpwd: secret #配置数据库密码
 companyname: Dolores科技有限公司
 ```
 ##### 编译执行初始化程序
 ``` bash
 cd dolores-ldap-init
-go build
+go build 
 ./dolores-ldap-init -path ./conf.yaml
 ```
 
