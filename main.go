@@ -78,6 +78,14 @@ func main() {
 	})
 
 	checkError(l.Modify(mq))
+	// 修改mdb数据库acl
+
+	mq = ldap.NewModifyRequest(`olcDatabase={1}mdb,cn=config`)
+
+	mq.Replace(`olcAccess`, []string{`to * by * none`})
+
+	err = l.Modify(mq)
+	checkError(err)
 
 	// 绑定 mdb 数据库
 	err = l.Bind(config.RootDN, config.RootPWD)
