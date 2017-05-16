@@ -82,10 +82,18 @@ func main() {
 
 	mq = ldap.NewModifyRequest(`olcDatabase={1}mdb,cn=config`)
 
-	mq.Replace(`olcAccess`, []string{`to * by * none`})
+	mq.Replace(`olcAccess`, []string{`to * by self read`})
 
 	err = l.Modify(mq)
 	checkError(err)
+
+	// 为mdb 添加overlay
+	aq = ldap.NewAddRequest(`olcOverlay=unique,olcDatabase={1}mdb,cn=config`)
+	aq.Attribute(`objectClass`, []string{`olcUniqueConfig`})
+	aq.Attribute(`olcOverlay`, []string{`unique`})
+	// 手机号码必须唯一
+	aq.Attribute(`olcUniqueURI`, []string{`ldap:///ou=member,dc=dolores,dc=store?telephoneNumber`})
+	checkError(l.Add(aq))
 
 	// 绑定 mdb 数据库
 	err = l.Bind(config.RootDN, config.RootPWD)
