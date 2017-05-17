@@ -53,9 +53,19 @@ func main() {
 		panic(err)
 	}
 
+	sq := ldap.NewSearchRequest(`cn={1}dolores,cn=schema,cn=config`,
+		ldap.ScopeBaseObject, ldap.DerefAlways, 0, 0, true, `(objectClass=olcSchemaConfig)`, []string{`objectClass`}, nil)
+
+	sr, e := l.Search(sq)
+	if e != nil {
+		panic(e)
+	}
+
 	aq := ldap.NewAddRequest(`cn=dolores,cn=schema,cn=config`)
-	aq.Attribute(`objectClass`, []string{`olcSchemaConfig`})
-	checkError(l.Add(aq))
+	if len(sr.Entries) == 0 {
+		aq.Attribute(`objectClass`, []string{`olcSchemaConfig`})
+		checkError(l.Add(aq))
+	}
 
 	mq := ldap.NewModifyRequest(`cn={1}dolores,cn=schema,cn=config`) // config数据库默认会加上序号 {0}是core
 	mq.Replace(`olcAttributeTypes`, []string{
@@ -64,8 +74,8 @@ func main() {
 		`( 0.9.3.2.8.0.3 NAME 'thirdPassword' DESC 'Kevin.Gong: password of im' EQUALITY octetStringMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{256} )`,
 		`( 0.9.3.2.8.0.4 NAME 'rbacType' DESC 'Kevin.Gong: rbace tpe for dolores.' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 		`( 0.9.3.2.8.0.5 NAME 'rbacRole' DESC 'Kevin.Gong: rbac alc of role' EQUALITY caseExactMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 USAGE userApplications )`,
-		`( 0.9.3.2.8.0.6 NAME ( 'unitpermissionIdentifier' 'upid' ) DESC 'Kevin.Gong: unit permission ids' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
-		`( 0.9.3.2.8.0.7 NAME ( 'personpermissionIdentifier' 'ppid' ) DESC 'Kevin.Gong: person permission ids' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
+		`( 0.9.3.2.8.0.6 NAME ( 'upid' 'unitpermissionIdentifier' ) DESC 'Kevin.Gong: unit permission ids' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
+		`( 0.9.3.2.8.0.7 NAME ( 'ppid' 'personpermissionIdentifier' ) DESC 'Kevin.Gong: person permission ids' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 		`( 0.9.3.2.8.0.8 NAME 'unitID' DESC 'Kevin.Gong unit id' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 		`( 0.9.3.2.8.0.9 NAME 'gender' DESC 'Kevin.Gong gender of member' EQUALITY numericStringMatch SUBSTR numericStringSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{16} )`,
 	})
