@@ -53,18 +53,16 @@ func main() {
 		panic(err)
 	}
 
-	sq := ldap.NewSearchRequest(`cn={1}dolores,cn=schema,cn=config`,
-		ldap.ScopeBaseObject, ldap.DerefAlways, 0, 0, true, `(objectClass=olcSchemaConfig)`, []string{`objectClass`}, nil)
+	sq := ldap.NewSearchRequest(`cn=schema,cn=config`,
+		ldap.ScopeBaseObject, ldap.DerefAlways, 0, 0, true, `(cn=dolores)`, []string{`objectClass`}, nil)
 
-	sr, e := l.Search(sq)
-	if e != nil {
-		panic(e)
-	}
-
-	aq := ldap.NewAddRequest(`cn=dolores,cn=schema,cn=config`)
+	sr, _ := l.Search(sq)
 	if len(sr.Entries) == 0 {
-		aq.Attribute(`objectClass`, []string{`olcSchemaConfig`})
-		checkError(l.Add(aq))
+		aq := ldap.NewAddRequest(`cn=dolores,cn=schema,cn=config`)
+		if len(sr.Entries) == 0 {
+			aq.Attribute(`objectClass`, []string{`olcSchemaConfig`})
+			checkError(l.Add(aq))
+		}
 	}
 
 	mq := ldap.NewModifyRequest(`cn={1}dolores,cn=schema,cn=config`) // config数据库默认会加上序号 {0}是core
@@ -78,6 +76,10 @@ func main() {
 		`( 0.9.3.2.8.0.7 NAME ( 'ppid' 'personpermissionIdentifier' ) DESC 'Kevin.Gong: person permission ids' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 		`( 0.9.3.2.8.0.8 NAME 'unitID' DESC 'Kevin.Gong unit id' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 		`( 0.9.3.2.8.0.9 NAME 'gender' DESC 'Kevin.Gong gender of member' EQUALITY numericStringMatch SUBSTR numericStringSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{16} )`,
+		`( 0.9.3.2.8.0.10 NAME 'action' DESC 'Kevin.Gong action for audit unit&member update' EQUALITY numericStringMatch SUBSTR numericStringSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{16} )`,
+		`( 0.9.3.2.8.0.11 NAME 'category' DESC 'Kevin.Gong audit category unit or member' EQUALITY numericStringMatch SUBSTR numericStringSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{16} )`,
+		`( 0.9.3.2.8.0.12 NAME ( 'mid' ) DESC 'Kevin.Gong: members ids for audit' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
+		`( 0.9.3.2.8.0.13 NAME 'auditContent' DESC 'Kevin.Gong: audit content' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 	})
 	mq.Replace(`olcObjectClasses`, []string{
 		`( 0.9.3.2.8.1.1 NAME 'member' DESC 'Kevin.Gong: member for dolores' STRUCTURAL MUST (id $ rbacRole $ rbacType $ unitID $ name $ telephoneNumber $ userPassword ) MAY ( labeledURI $ gender $ thirdAccount $ thirdPassword $ email $ title $ cn ) )`,
@@ -85,6 +87,7 @@ func main() {
 		`( 0.9.3.2.8.1.3 NAME 'permission' DESC 'Kevin.Gong: permission for dolores.' SUP top STRUCTURAL MUST ( id $ rbacType ) MAY ( cn $ description ) )`,
 		`( 0.9.3.2.8.1.4 NAME 'role' DESC 'Kevin.Gong: role for dolores.' SUP top STRUCTURAL MUST ( cn $ id $ upid $ ppid ) MAY description )`,
 		`( 0.9.3.2.8.1.5 NAME 'doloresType' DESC 'Kevin.Gong: deparment & person type for dolores.' SUP top STRUCTURAL MUST ( id $ cn ) MAY ( description ) )`,
+		`( 0.9.3.2.8.1.6 NAME 'audit' DESC 'Kevin.Gong: audit unit&member changes.' SUP top STRUCTURAL MUST ( action $ category $ mid $ auditContent ) )`,
 	})
 
 	checkError(l.Modify(mq))
@@ -98,12 +101,18 @@ func main() {
 	checkError(err)
 
 	// 为mdb 添加overlay
-	aq = ldap.NewAddRequest(`olcOverlay=unique,olcDatabase={1}mdb,cn=config`)
-	aq.Attribute(`objectClass`, []string{`olcUniqueConfig`})
-	aq.Attribute(`olcOverlay`, []string{`unique`})
-	// 手机号码必须唯一
-	aq.Attribute(`olcUniqueURI`, []string{`ldap:///ou=member,dc=dolores,dc=store?telephoneNumber`})
-	checkError(l.Add(aq))
+	sq = ldap.NewSearchRequest(`cn=config`,
+		ldap.ScopeWholeSubtree, ldap.DerefAlways, 0, 0, true, `(olcOverlay=unique)`, []string{`objectClass`}, nil)
+
+	sr, _ = l.Search(sq)
+	if len(sr.Entries) == 0 {
+		aq := ldap.NewAddRequest(`olcOverlay={0}unique,olcDatabase={1}mdb,cn=config`)
+		aq.Attribute(`objectClass`, []string{`olcUniqueConfig`})
+		aq.Attribute(`olcOverlay`, []string{`unique`})
+		// 手机号码必须唯一
+		aq.Attribute(`olcUniqueURI`, []string{`ldap:///ou=member,dc=dolores,dc=store?telephoneNumber`})
+		checkError(l.Add(aq))
+	}
 
 	// 绑定 mdb 数据库
 	err = l.Bind(config.RootDN, config.RootPWD)
@@ -112,7 +121,7 @@ func main() {
 	}
 
 	log.Print(`1. create root entry`)
-	aq = ldap.NewAddRequest(config.Subffix)
+	aq := ldap.NewAddRequest(config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organization`, `dcObject`, `top`})
 	aq.Attribute(`o`, []string{`root created by dolores ldap init tool`})
 	checkError(l.Add(aq))
@@ -176,6 +185,12 @@ func main() {
 	aq = ldap.NewAddRequest(`ou=member,ou=type,` + config.Subffix)
 	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
 	aq.Attribute(`ou`, []string{`type`})
+	checkError(l.Add(aq))
+
+	log.Print(`7 create audit`)
+	aq = ldap.NewAddRequest(`ou=audit,` + config.Subffix)
+	aq.Attribute(`objectClass`, []string{`organizationalUnit`, `top`})
+	aq.Attribute(`ou`, []string{`audit`})
 	checkError(l.Add(aq))
 
 	log.Print(`initial done ~`)
