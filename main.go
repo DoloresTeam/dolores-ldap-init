@@ -54,7 +54,7 @@ func main() {
 	}
 
 	sq := ldap.NewSearchRequest(`cn=schema,cn=config`,
-		ldap.ScopeBaseObject, ldap.DerefAlways, 0, 0, true, `(cn=dolores)`, []string{`objectClass`}, nil)
+		ldap.ScopeWholeSubtree, ldap.DerefAlways, 0, 0, true, `(cn={1}dolores)`, nil, nil)
 
 	sr, _ := l.Search(sq)
 	if len(sr.Entries) == 0 {
@@ -76,8 +76,8 @@ func main() {
 		`( 0.9.3.2.8.0.7 NAME ( 'ppid' 'personpermissionIdentifier' ) DESC 'Kevin.Gong: person permission ids' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 		`( 0.9.3.2.8.0.8 NAME 'unitID' DESC 'Kevin.Gong unit id' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 		`( 0.9.3.2.8.0.9 NAME 'gender' DESC 'Kevin.Gong gender of member' EQUALITY numericStringMatch SUBSTR numericStringSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{16} )`,
-		`( 0.9.3.2.8.0.10 NAME 'action' DESC 'Kevin.Gong action for audit unit&member update' EQUALITY numericStringMatch SUBSTR numericStringSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{16} )`,
-		`( 0.9.3.2.8.0.11 NAME 'category' DESC 'Kevin.Gong audit category unit or member' EQUALITY numericStringMatch SUBSTR numericStringSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{16} )`,
+		`( 0.9.3.2.8.0.10 NAME 'action' DESC 'Kevin.Gong action for audit unit&member update' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
+		`( 0.9.3.2.8.0.11 NAME 'category' DESC 'Kevin.Gong audit category unit or member' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 		`( 0.9.3.2.8.0.12 NAME ( 'mid' ) DESC 'Kevin.Gong: members ids for audit' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 		`( 0.9.3.2.8.0.13 NAME 'auditContent' DESC 'Kevin.Gong: audit content' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 	})
@@ -87,7 +87,7 @@ func main() {
 		`( 0.9.3.2.8.1.3 NAME 'permission' DESC 'Kevin.Gong: permission for dolores.' SUP top STRUCTURAL MUST ( id $ rbacType ) MAY ( cn $ description ) )`,
 		`( 0.9.3.2.8.1.4 NAME 'role' DESC 'Kevin.Gong: role for dolores.' SUP top STRUCTURAL MUST ( cn $ id $ upid $ ppid ) MAY description )`,
 		`( 0.9.3.2.8.1.5 NAME 'doloresType' DESC 'Kevin.Gong: deparment & person type for dolores.' SUP top STRUCTURAL MUST ( id $ cn ) MAY ( description ) )`,
-		`( 0.9.3.2.8.1.6 NAME 'audit' DESC 'Kevin.Gong: audit unit&member changes.' SUP top STRUCTURAL MUST ( action $ category $ mid $ auditContent ) )`,
+		`( 0.9.3.2.8.1.6 NAME 'audit' DESC 'Kevin.Gong: audit unit&member changes.' SUP top STRUCTURAL MUST ( id $ action $ category $ mid $ auditContent ) )`,
 	})
 
 	checkError(l.Modify(mq))
@@ -102,7 +102,7 @@ func main() {
 
 	// 为mdb 添加overlay
 	sq = ldap.NewSearchRequest(`cn=config`,
-		ldap.ScopeWholeSubtree, ldap.DerefAlways, 0, 0, true, `(olcOverlay=unique)`, []string{`objectClass`}, nil)
+		ldap.ScopeWholeSubtree, ldap.DerefAlways, 0, 0, true, `(objectClass=olcUniqueConfig)`, nil, nil)
 
 	sr, _ = l.Search(sq)
 	if len(sr.Entries) == 0 {
