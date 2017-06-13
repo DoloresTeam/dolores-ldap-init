@@ -80,10 +80,11 @@ func main() {
 		`( 0.9.3.2.8.0.11 NAME 'category' DESC 'Kevin.Gong audit category unit or member' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 		`( 0.9.3.2.8.0.12 NAME ( 'mid' ) DESC 'Kevin.Gong: members ids for audit' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 		`( 0.9.3.2.8.0.13 NAME 'auditContent' DESC 'Kevin.Gong: audit content' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
+		`( 0.9.3.2.8.0.14 NAME 'priority' DESC 'Kevin.Gong unit priority' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )`,
 	})
 	mq.Replace(`olcObjectClasses`, []string{
-		`( 0.9.3.2.8.1.1 NAME 'member' DESC 'Kevin.Gong: member for dolores' STRUCTURAL MUST (id $ rbacRole $ rbacType $ unitID $ name $ telephoneNumber $ userPassword ) MAY ( labeledURI $ gender $ thirdAccount $ thirdPassword $ email $ title $ cn ) )`,
-		`( 0.9.3.2.8.1.2 NAME 'unit' DESC 'Kevin.Gong: unit extended for dolores.' AUXILIARY MUST ( id $ rbacType ))`,
+		`( 0.9.3.2.8.1.1 NAME 'member' DESC 'Kevin.Gong: member for dolores' STRUCTURAL MUST (id $ rbacRole $ rbacType $ unitID $ name $ telephoneNumber $ userPassword ) MAY ( priority $ labeledURI $ gender $ thirdAccount $ thirdPassword $ email $ title $ cn ) )`,
+		`( 0.9.3.2.8.1.2 NAME 'unit' DESC 'Kevin.Gong: unit extended for dolores.' AUXILIARY MUST ( id $ rbacType ) MAY ( priority ) )`,
 		`( 0.9.3.2.8.1.3 NAME 'permission' DESC 'Kevin.Gong: permission for dolores.' SUP top STRUCTURAL MUST ( id $ rbacType ) MAY ( cn $ description ) )`,
 		`( 0.9.3.2.8.1.4 NAME 'role' DESC 'Kevin.Gong: role for dolores.' SUP top STRUCTURAL MUST ( cn $ id $ upid $ ppid ) MAY description )`,
 		`( 0.9.3.2.8.1.5 NAME 'doloresType' DESC 'Kevin.Gong: deparment & person type for dolores.' SUP top STRUCTURAL MUST ( id $ cn ) MAY ( description ) )`,
