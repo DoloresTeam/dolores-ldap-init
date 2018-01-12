@@ -18,7 +18,7 @@ Openldap安装完成以后会在 `/usr/local/etc/openldap`(根据编译时`./con
 
 ##### 获取`Dolores`初始化程序
 ```
-go get https://www.github.com/DoloresTeam/dolores-ldap-init
+git clone https://www.github.com/DoloresTeam/dolores-ldap-init
 ```
 ##### 配置`Dolores`初始化程序
 ``` yaml
